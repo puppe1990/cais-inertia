@@ -47,14 +47,17 @@ Before writing production code:
 
 ### Generated apps (`cais new`)
 
-| Directory            | Responsibility                            |
-| -------------------- | ----------------------------------------- |
-| `internal/app/`      | Bootstrap: route and dependency wiring    |
-| `internal/handlers/` | HTTP handlers                             |
-| `internal/store/`    | SQLite persistence                        |
-| `web/templates/`     | HTML templates (layouts, pages, partials) |
-| `web/static/`        | Tailwind CSS, HTMX, PWA (manifest, sw.js) |
-| `cmd/server/`        | Entry point                               |
+| Directory                | Responsibility                                      |
+| ------------------------ | --------------------------------------------------- |
+| `internal/app/`          | Bootstrap: route and dependency wiring (`deps.Inertia`) |
+| `internal/handlers/`     | HTTP handlers (gonertia + optional httpx fallback)  |
+| `internal/store/`        | SQLite persistence                                  |
+| `web/templates/app.html` | Inertia root shell (`{{ .inertia }}`)               |
+| `web/src/pages/`         | Svelte pages (`Home.svelte`, `Contact.svelte`, …)   |
+| `web/static/`            | Tailwind CSS, Vite build output, PWA                |
+| `cmd/server/`            | Entry point                                         |
+
+`cais g resource` / `cais g stream chat` still generate **HTMX/html** admin and chat templates until ported to Svelte.
 
 ## Router path params and groups
 
@@ -101,14 +104,14 @@ Dev seed user: `demo@example.com` / `password`. Sessions persist in SQLite via `
 
 Run inside a `cais new` app, not at the framework repo root:
 
-1. Test in `internal/handlers/foo_test.go`
-2. Template in `web/templates/pages/foo.html`
-3. Handler in `internal/handlers/foo.go` — embed `meta.Site` in page data
-4. Register the route in `internal/app/app.go`
+1. Test in `internal/handlers/foo_test.go` — use `setupTestInertia` + `assertInertiaComponent` (see `inertia_test.go`)
+2. Svelte page in `web/src/pages/Foo.svelte`
+3. Handler in `internal/handlers/foo.go` — `h.inertia.Render(w, r, "Foo", inertia.Props{"site": meta.ForRequest(h.site, r)})`
+4. Register the route in `internal/app/routes.go`
 
-Or use `cais g handler foo` / `cais g page foo` from the app directory.
+Or use `cais g handler foo` from the app directory (creates handler + `web/src/pages/Foo.svelte` + route patch).
 
-Pass `meta.SiteFrom(appName, cfg.AppURL)` from bootstrap so layouts render correct OG/Twitter tags (`absURL` template func).
+Pass `meta.SiteFrom(appName, cfg.AppURL)` from bootstrap for OG/Twitter props in Inertia pages.
 
 ## CSRF
 

@@ -29,23 +29,31 @@ func ProjectRoot(t *testing.T) string {
 	}
 }
 
-// TemplatesDir returns web/templates in scaffolded apps, or pkg/cais/testdata/templates
-// in the framework-only repo.
+// TemplatesDir returns web/templates when HTMX layouts exist, else pkg/cais/testdata/templates.
 func TemplatesDir(t *testing.T) string {
 	t.Helper()
 	root := ProjectRoot(t)
 	web := filepath.Join(root, "web", "templates")
-	if info, err := os.Stat(web); err == nil && info.IsDir() {
+	if _, err := os.Stat(filepath.Join(web, "layouts", "base.html")); err == nil {
 		return web
 	}
-	return filepath.Join(root, "pkg", "cais", "testdata", "templates")
+	testdata := filepath.Join(root, "pkg", "cais", "testdata", "templates")
+	if _, err := os.Stat(testdata); err == nil {
+		return testdata
+	}
+	return web
 }
 
-// NewRenderer loads templates from TemplatesDir.
+// NewRenderer loads templates from TemplatesDir, or a stub when only Inertia app.html exists.
 func NewRenderer(t *testing.T) *cais.Renderer {
 	t.Helper()
-	r, err := cais.NewRendererFromDir(TemplatesDir(t), nil)
+	dir := TemplatesDir(t)
+	r, err := cais.NewRendererFromDir(dir, nil)
 	if err != nil {
+		root := ProjectRoot(t)
+		if _, statErr := os.Stat(filepath.Join(root, "web", "templates", "app.html")); statErr == nil {
+			return cais.NewRendererStub(nil)
+		}
 		t.Fatal(err)
 	}
 	return r

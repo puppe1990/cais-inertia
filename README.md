@@ -1,6 +1,6 @@
 # Go on Cais
 
-Go web framework and CLI for mini apps: server-side HTML, HTMX, Tailwind, and SQLite.
+Go web framework and CLI for mini apps: **Inertia.js + Svelte**, Tailwind, and SQLite.
 
 **This repository is framework + CLI only.** There is no runnable app at the repo root. Use `cais new` to scaffold an app, then `cais dev` inside that directory.
 
@@ -30,7 +30,8 @@ cd ../myapp && cais install && cais dev   # http://localhost:8080
 | Layer    | Choice                                              |
 | -------- | --------------------------------------------------- |
 | Runtime  | Go 1.22+ (`net/http` stdlib)                        |
-| UI       | `html/template` + HTMX 2.x (in scaffolded apps)     |
+| UI       | Inertia.js + Svelte 5 (Vite → `web/static/build/`)    |
+| Server   | [gonertia](https://github.com/romsar/gonertia) v3     |
 | CSS      | Tailwind CSS 3.x                                    |
 | Database | SQLite (`modernc.org/sqlite`, no CGO)               |
 | Mobile   | PWA (manifest, service worker, offline page, icons) |
@@ -69,7 +70,7 @@ flowchart LR
 | `cais db migrate` / `status` / `rollback`      | SQL migrations                                     |
 | `cais jobs work` / `status`                    | SQLite job queue worker                            |
 | `cais routes [--verbose]`                      | List routes from generated `routes.go`             |
-| `cais doctor`                                  | Check HTMX, CSS, air (run inside a scaffolded app) |
+| `cais doctor`                                  | Check Inertia/Vite, CSS, air (inside a scaffolded app) |
 | `cais link [path] [--unlink]`                  | Local `go mod replace` for framework dev           |
 | `cais version`                                 | Print framework version                            |
 
@@ -88,7 +89,9 @@ r.Group(middleware.RequireAuth("/login"), func(g *cais.Router) {
 })
 ```
 
-**HTMX** — partial swaps via `httpx.RenderPageOrPartial` (forms return partials on `HX-Request`).
+**Inertia** — handlers render Svelte pages via `gonertia`; forms use `@inertiajs/svelte` `useForm`.
+
+**HTMX helpers** — still available in `pkg/cais/` for `cais g resource` admin CRUD (HTML templates) until ported to Svelte.
 
 **Session auth** — cookie sessions, 7-day expiry, `cais db prune-sessions`.
 
@@ -131,7 +134,7 @@ Deploy guide: [docs/deploy/lightsail-systemd.md](docs/deploy/lightsail-systemd.m
 
 ## AI-assisted development
 
-See [AGENTS.md](AGENTS.md) — TDD conventions, handler patterns, HTMX, store, and generator layout.
+See [AGENTS.md](AGENTS.md) — TDD conventions, Inertia handler patterns, store, and generator layout.
 
 ## License
 
