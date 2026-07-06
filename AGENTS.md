@@ -1,5 +1,11 @@
 # Cais — AI Conventions
 
+This repository (`github.com/puppe1990/cais-inertia`) ships the **framework and CLI only** — `pkg/cais/`, `internal/cli/`, `cmd/cais`. There is no `cmd/server`, `internal/handlers/`, or `web/` at the repo root.
+
+- **Framework work** — edit `pkg/cais/` or `internal/cli/`; run `make test` here.
+- **App work** — scaffold with `cais new myapp ../myapp`, then edit handlers/templates inside that directory; run `cais dev` there.
+- **Local framework link** — `cais link ../cais-inertia` inside a scaffolded app wires `go mod replace`.
+
 ## Rule #1: TDD is mandatory
 
 Before writing production code:
@@ -12,6 +18,8 @@ Before writing production code:
 6. Only then refactor
 
 ## Structure
+
+### This repo (framework + CLI)
 
 | Directory              | Responsibility                                                                        |
 | ---------------------- | ------------------------------------------------------------------------------------- |
@@ -31,12 +39,22 @@ Before writing production code:
 | `pkg/cais/pwa/`        | Default PWA assets generator (manifest, icons, og.png)                                |
 | `pkg/cais/cache/`      | In-memory TTL cache (stdlib)                                                          |
 | `pkg/cais/pagination/` | Offset/limit helpers for list pages                                                   |
-| `internal/app/`        | Bootstrap: route and dependency wiring                                                |
-| `internal/handlers/`   | HTTP handlers                                                                         |
-| `internal/store/`      | SQLite persistence                                                                    |
-| `web/templates/`       | HTML templates (layouts, pages, partials)                                             |
-| `web/static/`          | Tailwind CSS, HTMX, PWA (manifest, sw.js, icons)                                      |
-| `cmd/server/`          | Entry point                                                                           |
+| `internal/cli/`        | Generators (`cais new`, `cais g`, `cais destroy`) and embedded scaffold templates     |
+| `cmd/cais/`            | CLI entry point                                                                       |
+| `cmd/pwagen/`          | PWA asset generator                                                                   |
+
+`pkg/cais/testutil.NewRenderer` loads `web/templates` when present (scaffolded apps), otherwise `pkg/cais/testdata/templates/`. Go-template HTML under `testdata/` is listed in `.prettierignore`.
+
+### Generated apps (`cais new`)
+
+| Directory            | Responsibility                            |
+| -------------------- | ----------------------------------------- |
+| `internal/app/`      | Bootstrap: route and dependency wiring    |
+| `internal/handlers/` | HTTP handlers                             |
+| `internal/store/`    | SQLite persistence                        |
+| `web/templates/`     | HTML templates (layouts, pages, partials) |
+| `web/static/`        | Tailwind CSS, HTMX, PWA (manifest, sw.js) |
+| `cmd/server/`        | Entry point                               |
 
 ## Router path params and groups
 
@@ -79,12 +97,16 @@ Dev seed user: `demo@example.com` / `password`. Sessions persist in SQLite via `
 
 **Production cookies** — `session.CookieOptionsFromConfig(cfg)` sets `Secure` when `cfg.CookieSecure()` is true (`ENV=production`).
 
-## New page
+## New page (scaffolded app)
+
+Run inside a `cais new` app, not at the framework repo root:
 
 1. Test in `internal/handlers/foo_test.go`
 2. Template in `web/templates/pages/foo.html`
 3. Handler in `internal/handlers/foo.go` — embed `meta.Site` in page data
 4. Register the route in `internal/app/app.go`
+
+Or use `cais g handler foo` / `cais g page foo` from the app directory.
 
 Pass `meta.SiteFrom(appName, cfg.AppURL)` from bootstrap so layouts render correct OG/Twitter tags (`absURL` template func).
 
@@ -185,7 +207,7 @@ Agent mode — `chat_sse_agent.html`: opt-in with `data-cais-chat="true"`. SSE e
 
 **Chat form** — `{{ hxChatForm "/chat/{id}/messages" "#chat-thinking" }}` on the `<form>`: `cais.js` `bindChatEnterSubmit` sends on Enter, Shift+Enter newline. Input clears on submit; use `data-cais-chat-optimistic="true"` only when the POST partial does **not** return a user bubble (otherwise `dedupOptimisticUserBubble` drops the duplicate). Optional `data-cais-poll-url` on `#chat-sse` enables history refresh fallback when SSE fails (poll is skipped while stream slots are active).
 
-`cais doctor` warns when `sse-ext.min.js` is present and `WriteTimeout > 0` in `internal/app/app.go`.
+`cais doctor` (run inside a scaffolded app) warns when `sse-ext.min.js` is present and `WriteTimeout > 0` in `internal/app/app.go`.
 
 **Chat handler tests** — `cais g stream chat` generates handler tests using `testutil.AssertChatMarkers` (Show) and `testutil.AssertHTMLContains` (PostMessage bubble). Missing records return `http.NotFound` (not 500):
 
@@ -255,7 +277,7 @@ Generate the parent resource first (`cais g resource category --fields name:stri
 
 ## Integration tests (auth + contact)
 
-Multi-step flows belong in `internal/app/app_test.go` (full router + CSRF + session):
+In scaffolded apps, multi-step flows belong in `internal/app/app_test.go` (full router + CSRF + session):
 
 1. `GET /login` or `/contact` — read `csrf` cookie
 2. `POST` with matching `csrf_token` field + cookie
@@ -278,13 +300,15 @@ Layout loads `cais.js` after `htmx.min.js` — CSRF header, focus restore, optim
 - **Response headers** — `cais.SetToast`, `cais.SetFocus(w, "#field")`, `cais.SetRetarget`, `cais.SetTrigger`
 - **Admin CRUD** — `cais g resource` generates `hxForm` admin forms, inline delete (`hx-swap="delete"`), `RenderPageOrPartial` on 422
 
-## New table
+## New table (scaffolded app)
 
 1. Store test with `":memory:"` before the migration
 2. SQL in `internal/store/migrations/NNN_name.sql`
 3. Methods on the `store.Store` interface
 4. Wrap DB with `sqllog.Wrap` in `NewSQLiteStore` for development query logs
 5. Migrations tracked in `schema_migrations` via `pkg/cais/migrate` (idempotent on boot)
+
+Prefer `cais g model` / `cais g resource` / `cais g migration` from the app directory.
 
 **SQLite concurrency (SSE / chat)** — scaffold `NewSQLiteStore` calls `sqlite.Configure`: `journal_mode=WAL`, `busy_timeout=5000`, `foreign_keys=ON`, `MaxOpenConns(1)`. WAL allows concurrent readers while a writer holds the lock briefly; `busy_timeout` retries instead of immediate `SQLITE_BUSY`. SSE handlers poll the DB in a loop — keep writes short and avoid long transactions during streams. For heavy write concurrency, consider a dedicated writer queue.
 
@@ -308,7 +332,7 @@ In `ENV=development`:
 - `sqllog.ConfigForEnv(env)` — SQL JSON logs in development (`kind: sql`); plain text when `JSON: false`
 - `devlog.Register(r, cfg.Env, buf)` — mounts `/logs` (localhost only, HTMX refresh)
 
-Boot banner via `boot.Print` in `cmd/server/main.go`. Port auto-pick via `cais.ResolvePort` when preferred port is busy.
+Boot banner via `boot.Print` in the scaffolded app's `cmd/server/main.go`. Port auto-pick via `cais.ResolvePort` when preferred port is busy.
 
 Set `APP_URL` for absolute OG image URLs. **`APP_URL` is required when `ENV=production`** — `cfg.Validate()` fails on boot if missing.
 
@@ -338,8 +362,8 @@ cais g [--dry-run] auth       # login/logout + protected dashboard
 cais g [--dry-run] console    # scaffold cmd/console/main.go
 cais g [--dry-run] ci         # add CI/pre-commit to existing apps
 cais g [--dry-run] job send_welcome --cron "0 3 * * *"
-cais doctor                   # verify htmx, air, go.mod
-cais routes                   # list routes from internal/app/routes.go
+cais doctor                   # verify htmx, air, go.mod (inside a scaffolded app)
+cais routes                   # list routes from internal/app/routes.go (inside a scaffolded app)
 ```
 
 Field types: `string`, `text`, `url`, `bool`, `int`, `date`, `references` (or `name:belongs_to`). Suffix `?` for optional.
@@ -366,7 +390,7 @@ cais test     # go test ./...
 cais doctor   # verify htmx, air, go.mod
 cais console  # Rails-style REPL (store, cfg, db + sql)
 cais routes   # list HTTP routes from internal/app/routes.go
-cais link [../Cais] [--unlink]  # go.mod replace for local framework dev
+cais link [../cais-inertia] [--unlink]  # go.mod replace for local framework dev
 cais db migrate        # run pending migrations
 cais db status         # list applied/pending migrations
 cais db rollback       # roll back last migration (runs -- down SQL when present)
@@ -448,7 +472,7 @@ go test ./internal/cli/... -count=1
 
 **Patch markers** — generated apps must keep `registerRoutes`, `Close() error`, and `<!-- cais:nav -->` (or `</nav>`) for destroy/generator patches to work.
 
-## Framework commands (Cais repo)
+## Framework commands (this repo)
 
 ```bash
 make test-v   # TDD: watch RED/GREEN
@@ -456,15 +480,16 @@ make test     # validation with -race
 make lint     # golangci-lint
 make format   # prettier --write
 make ci       # test + lint + format-check
-make dev      # hot reload + tailwind watch
 make build    # bin/cais
-make pwa      # regenerate PWA assets (manifest fullscreen, icons, og.png)
-make docker   # ~15-20MB image
+make install-cli  # go install ./cmd/cais
+make pwa      # regenerate default PWA assets in pkg/cais/pwa/assets
 ```
+
+`make dev`, `cais dev`, and `cais server` apply to **scaffolded apps**, not this framework repo. CI smoke: `scripts/smoke-scaffold.sh` (`cais new` → `go test` → `go build ./cmd/server`).
 
 ## Production deploy (Lightsail / systemd)
 
-Cross-compile and ship static assets beside the binary:
+Run from a **scaffolded app** directory:
 
 ```bash
 cais build --os linux --arch amd64 -o bin/server-linux
@@ -476,6 +501,8 @@ tar czf release.tar.gz bin/server-linux web/static
 - `cais doctor` checks `web/static` + `manifest.webmanifest`
 - Set `STATIC_DIR` / `TEMPLATES_DIR` when `WorkingDirectory` is not the app root
 - Dev-only seeds (demo user) do not run when `ENV=production`; use `cais db seed` for catalog data
+
+The framework repo Dockerfile builds the `cais` CLI only; app images are built from generated apps.
 
 Pre-commit (tests, lint, prettier): `make pre-commit-install` once, then hooks run on every commit.
 
