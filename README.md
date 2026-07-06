@@ -39,43 +39,43 @@ make ci                   # test + lint + format-check locally
 
 ## CLI (Rails-style)
 
-| Command                                                                                                                            | Description                                                |
-| ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| `cais new <app> [dir]`                                                                                                             | Scaffold a new app (home, contact, dashboard)              |
-| `cais new <app> [dir] --minimal`                                                                                                   | Slim app (home only)                                       |
-| `cais new <app> [dir] --blank`                                                                                                     | Empty app (no starter content)                             |
-| `cais new <app> [dir] --module <path>`                                                                                             | Override Go module path                                    |
-| `cais g [--dry-run] handler <name>`                                                                                                | Handler + test + page + route                              |
-| `cais g [--dry-run] resource <name> [--fields ...] [--public] [--paginate] [--no-seed] [--force] [--admin-auth session or bearer]` | Full CRUD + optional public page                           |
-| `cais destroy [--dry-run] resource\|handler\|model <name>`                                                                         | Remove generated files + unpatch routes/store/seeds        |
-| `cais destroy [--dry-run] auth`                                                                                                    | Remove login/auth files + revert session middleware        |
-| `cais destroy [--dry-run] migration <name>`                                                                                        | Remove `*_<name>.sql` migration file                       |
-| `cais g [--dry-run] model <name> [--fields ...]`                                                                                   | Model + migration + store (no handlers/UI)                 |
-| `cais g [--dry-run] page <name>`                                                                                                   | Page template only                                         |
-| `cais g [--dry-run] migration <name>`                                                                                              | SQL migration file (`-- up` / `-- down`)                   |
-| `cais g [--dry-run] auth`                                                                                                          | Add login/logout + protect dashboard                       |
-| `cais g [--dry-run] console`                                                                                                       | Scaffold `cmd/console/main.go`                             |
-| `cais g [--dry-run] ci`                                                                                                            | Add GitHub Actions CI, pre-commit, lint, Prettier          |
-| `cais g [--dry-run] job <name> [--cron "0 3 * * *"]`                                                                               | Background job handler + registry + `cmd/worker`           |
+| Command                                                                                                                            | Description                                                 |
+| ---------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `cais new <app> [dir]`                                                                                                             | Scaffold a new app (home, contact, dashboard)               |
+| `cais new <app> [dir] --minimal`                                                                                                   | Slim app (home only)                                        |
+| `cais new <app> [dir] --blank`                                                                                                     | Empty app (no starter content)                              |
+| `cais new <app> [dir] --module <path>`                                                                                             | Override Go module path                                     |
+| `cais g [--dry-run] handler <name>`                                                                                                | Handler + test + page + route                               |
+| `cais g [--dry-run] resource <name> [--fields ...] [--public] [--paginate] [--no-seed] [--force] [--admin-auth session or bearer]` | Full CRUD + optional public page                            |
+| `cais destroy [--dry-run] resource\|handler\|model <name>`                                                                         | Remove generated files + unpatch routes/store/seeds         |
+| `cais destroy [--dry-run] auth`                                                                                                    | Remove login/auth files + revert session middleware         |
+| `cais destroy [--dry-run] migration <name>`                                                                                        | Remove `*_<name>.sql` migration file                        |
+| `cais g [--dry-run] model <name> [--fields ...]`                                                                                   | Model + migration + store (no handlers/UI)                  |
+| `cais g [--dry-run] page <name>`                                                                                                   | Page template only                                          |
+| `cais g [--dry-run] migration <name>`                                                                                              | SQL migration file (`-- up` / `-- down`)                    |
+| `cais g [--dry-run] auth`                                                                                                          | Add login/logout + protect dashboard                        |
+| `cais g [--dry-run] console`                                                                                                       | Scaffold `cmd/console/main.go`                              |
+| `cais g [--dry-run] ci`                                                                                                            | Add GitHub Actions CI, pre-commit, lint, Prettier           |
+| `cais g [--dry-run] job <name> [--cron "0 3 * * *"]`                                                                               | Background job handler + registry + `cmd/worker`            |
 | `cais install`                                                                                                                     | `npm install` + `go mod tidy` (run inside a scaffolded app) |
-| `cais css`                                                                                                                         | Build Tailwind CSS                                         |
-| `cais dev`                                                                                                                         | Hot reload (`air` + tailwind watch)                        |
-| `cais build [--os linux] [--arch amd64] [-o path]`                                                                                 | Build `bin/server` (cross-compile for deploy)              |
-| `cais server`                                                                                                                      | Run `go run ./cmd/server`                                  |
-| `cais test`                                                                                                                        | Run `go test ./...`                                        |
-| `cais console`                                                                                                                     | Interactive REPL (store, cfg, db + SQL)                    |
-| `cais routes [--verbose]`                                                                                                          | List HTTP routes from `internal/app/routes.go`             |
-| `cais db migrate`                                                                                                                  | Run pending SQL migrations                                 |
-| `cais db status`                                                                                                                   | List applied/pending migrations                            |
-| `cais db rollback`                                                                                                                 | Roll back last migration (runs `-- down` SQL when present) |
-| `cais db prune-sessions`                                                                                                           | Delete expired login sessions from SQLite                  |
-| `cais db seed`                                                                                                                     | Run `internal/db/seeds.go` (idempotent demo data)          |
-| `cais db seed --list`                                                                                                              | List seed helpers referenced in `seeds.go`                 |
-| `cais jobs work [--queues default,mail] [--concurrency 2]`                                                                         | Run background job worker + dispatcher                     |
-| `cais jobs status`                                                                                                                 | Show job counts by status                                  |
-| `cais version`                                                                                                                     | Print Cais framework version                               |
-| `cais doctor`                                                                                                                      | Check htmx, air, go.mod, CSS (run inside a scaffolded app) |
-| `cais link [../cais-inertia] [--unlink]`                                                                                           | `go mod replace` for local framework dev                   |
+| `cais css`                                                                                                                         | Build Tailwind CSS                                          |
+| `cais dev`                                                                                                                         | Hot reload (`air` + tailwind watch)                         |
+| `cais build [--os linux] [--arch amd64] [-o path]`                                                                                 | Build `bin/server` (cross-compile for deploy)               |
+| `cais server`                                                                                                                      | Run `go run ./cmd/server`                                   |
+| `cais test`                                                                                                                        | Run `go test ./...`                                         |
+| `cais console`                                                                                                                     | Interactive REPL (store, cfg, db + SQL)                     |
+| `cais routes [--verbose]`                                                                                                          | List HTTP routes from `internal/app/routes.go`              |
+| `cais db migrate`                                                                                                                  | Run pending SQL migrations                                  |
+| `cais db status`                                                                                                                   | List applied/pending migrations                             |
+| `cais db rollback`                                                                                                                 | Roll back last migration (runs `-- down` SQL when present)  |
+| `cais db prune-sessions`                                                                                                           | Delete expired login sessions from SQLite                   |
+| `cais db seed`                                                                                                                     | Run `internal/db/seeds.go` (idempotent demo data)           |
+| `cais db seed --list`                                                                                                              | List seed helpers referenced in `seeds.go`                  |
+| `cais jobs work [--queues default,mail] [--concurrency 2]`                                                                         | Run background job worker + dispatcher                      |
+| `cais jobs status`                                                                                                                 | Show job counts by status                                   |
+| `cais version`                                                                                                                     | Print Cais framework version                                |
+| `cais doctor`                                                                                                                      | Check htmx, air, go.mod, CSS (run inside a scaffolded app)  |
+| `cais link [../cais-inertia] [--unlink]`                                                                                           | `go mod replace` for local framework dev                    |
 
 Field types: `string`, `text`, `url`, `bool`, `int`, `date`, `references` (or `name:belongs_to`). Suffix `?` for optional.
 
@@ -164,17 +164,17 @@ cais jobs work --concurrency 2
 
 ## Environment variables (scaffolded apps)
 
-| Variable          | Default         | Description                                                               |
-| ----------------- | --------------- | ------------------------------------------------------------------------- |
-| `PORT`            | `:8080`         | Server port                                                               |
-| `DB_PATH`         | `./data/app.db` | SQLite file path                                                          |
-| `ENV`             | `development`   | Environment                                                               |
-| `APP_URL`         | _(empty)_       | Public base URL for OG/Twitter tags (required in production)              |
-| `ADMIN_TOKEN`     | _(empty)_       | Bearer token for admin routes (required in production)                    |
-| `LOCALE`          | `en`            | UI locale (`en` or `pt`)                                                  |
-| `TRUSTED_PROXIES` | _(empty)_       | Comma-separated proxy IPs for `X-Forwarded-For` (rate limits, client IP)  |
-| `CAIS_REPLACE`    | _(empty)_       | Local path to Cais framework for `go mod replace` during scaffold         |
-| `CAIS_SKIP_TIDY`  | _(empty)_       | Set to `1` to skip `go mod tidy` after scaffold (tests/CI)                |
+| Variable          | Default         | Description                                                              |
+| ----------------- | --------------- | ------------------------------------------------------------------------ |
+| `PORT`            | `:8080`         | Server port                                                              |
+| `DB_PATH`         | `./data/app.db` | SQLite file path                                                         |
+| `ENV`             | `development`   | Environment                                                              |
+| `APP_URL`         | _(empty)_       | Public base URL for OG/Twitter tags (required in production)             |
+| `ADMIN_TOKEN`     | _(empty)_       | Bearer token for admin routes (required in production)                   |
+| `LOCALE`          | `en`            | UI locale (`en` or `pt`)                                                 |
+| `TRUSTED_PROXIES` | _(empty)_       | Comma-separated proxy IPs for `X-Forwarded-For` (rate limits, client IP) |
+| `CAIS_REPLACE`    | _(empty)_       | Local path to Cais framework for `go mod replace` during scaffold        |
+| `CAIS_SKIP_TIDY`  | _(empty)_       | Set to `1` to skip `go mod tidy` after scaffold (tests/CI)               |
 
 Deploy guide for generated apps: [docs/deploy/lightsail-systemd.md](docs/deploy/lightsail-systemd.md).
 

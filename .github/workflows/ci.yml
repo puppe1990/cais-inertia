@@ -69,5 +69,3 @@ jobs:
 
       - name: Smoke cais new
         run: bash scripts/smoke-scaffold.sh
-
-
