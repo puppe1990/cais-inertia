@@ -2,7 +2,6 @@ package stream
 
 import (
 	"net/http/httptest"
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -16,8 +15,7 @@ type chatMessage struct {
 }
 
 func TestChatSSEPartial_appendPattern(t *testing.T) {
-	root := testutil.ProjectRoot(t)
-	r, err := cais.NewRendererFromDir(filepath.Join(root, "web", "templates"), nil)
+	r, err := cais.NewRendererFromDir(testutil.TemplatesDir(t), nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -66,8 +64,7 @@ func TestChatSSEPartial_appendPattern(t *testing.T) {
 }
 
 func TestChatSSEAgentPartial_multiSlotPattern(t *testing.T) {
-	root := testutil.ProjectRoot(t)
-	r, err := cais.NewRendererFromDir(filepath.Join(root, "web", "templates"), nil)
+	r, err := cais.NewRendererFromDir(testutil.TemplatesDir(t), nil)
 	if err != nil {
 		t.Fatal(err)
 	}

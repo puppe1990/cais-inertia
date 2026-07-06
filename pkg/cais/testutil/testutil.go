@@ -29,11 +29,22 @@ func ProjectRoot(t *testing.T) string {
 	}
 }
 
-// NewRenderer loads templates from web/templates relative to module root.
-func NewRenderer(t *testing.T) *cais.Renderer {
+// TemplatesDir returns web/templates in scaffolded apps, or pkg/cais/testdata/templates
+// in the framework-only repo.
+func TemplatesDir(t *testing.T) string {
 	t.Helper()
 	root := ProjectRoot(t)
-	r, err := cais.NewRendererFromDir(filepath.Join(root, "web", "templates"), nil)
+	web := filepath.Join(root, "web", "templates")
+	if info, err := os.Stat(web); err == nil && info.IsDir() {
+		return web
+	}
+	return filepath.Join(root, "pkg", "cais", "testdata", "templates")
+}
+
+// NewRenderer loads templates from TemplatesDir.
+func NewRenderer(t *testing.T) *cais.Renderer {
+	t.Helper()
+	r, err := cais.NewRendererFromDir(TemplatesDir(t), nil)
 	if err != nil {
 		t.Fatal(err)
 	}
