@@ -47,15 +47,15 @@ Before writing production code:
 
 ### Generated apps (`cais new`)
 
-| Directory                | Responsibility                                      |
-| ------------------------ | --------------------------------------------------- |
+| Directory                | Responsibility                                          |
+| ------------------------ | ------------------------------------------------------- |
 | `internal/app/`          | Bootstrap: route and dependency wiring (`deps.Inertia`) |
-| `internal/handlers/`     | HTTP handlers (gonertia + optional httpx fallback)  |
-| `internal/store/`        | SQLite persistence                                  |
-| `web/templates/app.html` | Inertia root shell (`{{ .inertia }}`)               |
-| `web/src/pages/`         | Svelte pages (`Home.svelte`, `Contact.svelte`, …)   |
-| `web/static/`            | Tailwind CSS, Vite build output, PWA                |
-| `cmd/server/`            | Entry point                                         |
+| `internal/handlers/`     | HTTP handlers (gonertia + optional httpx fallback)      |
+| `internal/store/`        | SQLite persistence                                      |
+| `web/templates/app.html` | Inertia root shell (`{{ .inertia }}`)                   |
+| `web/src/pages/`         | Svelte pages (`Home.svelte`, `Contact.svelte`, …)       |
+| `web/static/`            | Tailwind CSS, Vite build output, PWA                    |
+| `cmd/server/`            | Entry point                                             |
 
 `cais g resource` / `cais g stream chat` still generate **HTMX/html** admin and chat templates until ported to Svelte.
 

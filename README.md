@@ -30,8 +30,8 @@ cd ../myapp && cais install && cais dev   # http://localhost:8080
 | Layer    | Choice                                              |
 | -------- | --------------------------------------------------- |
 | Runtime  | Go 1.22+ (`net/http` stdlib)                        |
-| UI       | Inertia.js + Svelte 5 (Vite → `web/static/build/`)    |
-| Server   | [gonertia](https://github.com/romsar/gonertia) v3     |
+| UI       | Inertia.js + Svelte 5 (Vite → `web/static/build/`)  |
+| Server   | [gonertia](https://github.com/romsar/gonertia) v3   |
 | CSS      | Tailwind CSS 3.x                                    |
 | Database | SQLite (`modernc.org/sqlite`, no CGO)               |
 | Mobile   | PWA (manifest, service worker, offline page, icons) |
@@ -57,22 +57,22 @@ flowchart LR
 
 ## CLI
 
-| Command                                        | Description                                        |
-| ---------------------------------------------- | -------------------------------------------------- |
-| `cais new <app> [dir]`                         | Scaffold app (home, contact, dashboard)            |
-| `cais new <app> --minimal`                     | Home page only                                     |
-| `cais new <app> --blank`                       | Empty shell                                        |
-| `cais g handler <name>`                        | Handler + test + page + route                      |
-| `cais g resource <name> [--fields ...]`        | Admin CRUD (+ `--public`, `--paginate`)            |
-| `cais g auth`                                  | Login/logout + protected dashboard                 |
-| `cais g job <name> [--cron "..."]`             | Background job + worker scaffold                   |
-| `cais destroy resource\|handler\|model <name>` | Undo generator output                              |
-| `cais db migrate` / `status` / `rollback`      | SQL migrations                                     |
-| `cais jobs work` / `status`                    | SQLite job queue worker                            |
-| `cais routes [--verbose]`                      | List routes from generated `routes.go`             |
+| Command                                        | Description                                            |
+| ---------------------------------------------- | ------------------------------------------------------ |
+| `cais new <app> [dir]`                         | Scaffold app (home, contact, dashboard)                |
+| `cais new <app> --minimal`                     | Home page only                                         |
+| `cais new <app> --blank`                       | Empty shell                                            |
+| `cais g handler <name>`                        | Handler + test + page + route                          |
+| `cais g resource <name> [--fields ...]`        | Admin CRUD (+ `--public`, `--paginate`)                |
+| `cais g auth`                                  | Login/logout + protected dashboard                     |
+| `cais g job <name> [--cron "..."]`             | Background job + worker scaffold                       |
+| `cais destroy resource\|handler\|model <name>` | Undo generator output                                  |
+| `cais db migrate` / `status` / `rollback`      | SQL migrations                                         |
+| `cais jobs work` / `status`                    | SQLite job queue worker                                |
+| `cais routes [--verbose]`                      | List routes from generated `routes.go`                 |
 | `cais doctor`                                  | Check Inertia/Vite, CSS, air (inside a scaffolded app) |
-| `cais link [path] [--unlink]`                  | Local `go mod replace` for framework dev           |
-| `cais version`                                 | Print framework version                            |
+| `cais link [path] [--unlink]`                  | Local `go mod replace` for framework dev               |
+| `cais version`                                 | Print framework version                                |
 
 App commands (`cais dev`, `cais server`, `cais build`, `cais css`, `cais install`) run **inside a scaffolded app**, not at the framework repo root.
 
