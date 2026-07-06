@@ -308,5 +308,3 @@ const tplPartialSuccess = `{{"{{- "}}define "contact_success" -{{"}}"}}
 <div class="text-green-600 text-sm mb-4">{{"{{"}} t "contact.success" {{"}}"}}</div>
 {{"{{- "}}end -{{"}}"}}
 `
-
-
